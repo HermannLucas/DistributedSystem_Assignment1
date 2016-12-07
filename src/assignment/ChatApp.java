@@ -10,6 +10,7 @@ import java.util.UUID;
 import Listener.ChatListener;
 import Listener.UsersListener;
 import Notifications.ChatNotification;
+import Notifications.MsgNotification;
 import Notifications.UsersNotification;
 import Ressources.SpaceUtils;
 import net.jini.core.lease.Lease;
@@ -185,6 +186,7 @@ public class ChatApp {
 	// Method generating a new chartoom
 	protected void createChat (List<String> users) {
 		UUID chatId = UUID.randomUUID();
+		
 		ChatRoom chatroom = new ChatRoom(chatId, users);
 		
 		// Writing the new chatroom object in the space and sending a notification to all the concerned users
@@ -205,7 +207,24 @@ public class ChatApp {
 	}
 	
 	public void connectToChat(UUID chatroom) {
+		
+		// Collecting the list of users present to use it as a title
+		ChatRoom meow = new ChatRoom();
+		String title = "Chat : "; 
+		meow.id = chatroom;
+		try {
+			meow = (ChatRoom) space.read(meow, null, 5*1000);
+			meow.users.forEach((usr) -> {
+				title.concat(usr + ", ");
+				System.out.println(title);
+			});
+//			title.substring(0, title.length() - 2);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		chatWdw = new ChatsWindow(username, chatroom);
+		chatWdw.setTitle(title);
 		chatWdw.setVisible(true);
 	}
 

@@ -29,7 +29,7 @@ public class UserPanel extends JFrame {
 		
 		vador = parent;
 
-		setTitle ("Connected Users");
+		setTitle ("Connected Users - " + vador.username);
 		addWindowListener (new java.awt.event.WindowAdapter () {
 			public void windowClosing (java.awt.event.WindowEvent evt) {
 				vador.terminate();

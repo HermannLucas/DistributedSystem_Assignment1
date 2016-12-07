@@ -17,6 +17,7 @@ public class ChatsWindow extends JFrame {
 	
 	private JPanel inputPanel;
 	protected JTextArea textPart;
+	protected JTextArea msgInput;
 	
 	public ChatsWindow (String me,UUID chatId) {
 		
@@ -36,7 +37,7 @@ public class ChatsWindow extends JFrame {
 		inputPanel = new JPanel();
 		inputPanel.setLayout(new FlowLayout ());
 		
-		JTextArea msgInput = new JTextArea (2,125);
+		msgInput = new JTextArea (2,125);
 		msgInput.setText("");
 		
 		inputPanel.add(msgInput, "Center");

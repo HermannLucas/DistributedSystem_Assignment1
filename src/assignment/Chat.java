@@ -20,6 +20,7 @@ public class Chat {
 		// and make it listen for new messages
 		luke = new MessageHandler (this);
 		luke.listen();
+//		vador.textPart.setText("Chat started.");
 	}
 	 // NEED TO MODIFY THIS PART
 	public void sendMessage(String txt) {
@@ -34,6 +35,7 @@ public class Chat {
 	// Collect the text from a message object and update the graphical interface
 	protected void updateText (Message msg) {
 		
-		vador.textPart.append(msg.sender + " sent : " + msg.content);
+		vador.textPart.append("\n" + msg.sender + " sent : " + msg.content);
+		vador.msgInput.setText(null);
 	}
 }
