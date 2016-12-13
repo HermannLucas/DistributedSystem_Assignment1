@@ -2,18 +2,20 @@ package Notifications;
 
 import net.jini.core.entry.Entry;
 
-public class UsersNotification implements Entry {
+public class UserNotification implements Entry {
 	
 	// Variables
 	public String who;
+	public String target;
 	public Boolean connected;
 	
 	// Empty constructor (for templates)
-	public UsersNotification () {
+	public UserNotification () {
 	}
 	
-	public UsersNotification (String me, Boolean status) {
+	public UserNotification (String me, String reciepient, Boolean status) {
 		who = me;
+		target = reciepient;
 		connected = status;
 	}
 

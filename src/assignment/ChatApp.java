@@ -11,7 +11,7 @@ import Listener.ChatListener;
 import Listener.UsersListener;
 import Notifications.ChatNotification;
 import Notifications.MsgNotification;
-import Notifications.UsersNotification;
+import Notifications.UserNotification;
 import Ressources.SpaceUtils;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
@@ -113,11 +113,20 @@ public class ChatApp {
 			}
 			
 			txn.commit();
-			
+
+			userList.users.forEach((usr) -> {
+				if (username != usr) {
+					try {
+						space.write(new UserNotification(username, usr, true), null, 10*1000);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
 			new UsersListener(this);
-			space.write(new UsersNotification(username, true), null, 10*1000);
 			
 			usersPan();
+			collectSavedMessages();
 			
 			new ChatListener(this);
 		} catch (Exception e) {
@@ -157,7 +166,13 @@ public class ChatApp {
 			
 			txn.commit();
 			
-			space.write(new UsersNotification(username, false), null, 10*1000);
+			userList.users.forEach((usr) -> {
+				try {
+					space.write(new UserNotification(username, usr, false), null, 10*1000);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -168,9 +183,15 @@ public class ChatApp {
 
 		usersWdw = new UserPanel(this);
 		usersWdw.setVisible(true);
-		for (Iterator<String> iter = userList.users.iterator(); iter.hasNext(); ) {
-			usersWdw.userLiModel.addElement(iter.next());
-		}
+		
+		userList.users.forEach((usr) -> {
+			if (!username.equals(usr)) {
+				usersWdw.userLiModel.addElement(usr);
+			}
+		});
+//		for (Iterator<String> iter = userList.users.iterator(); iter.hasNext(); ) {
+//			usersWdw.userLiModel.addElement(iter.next());
+//		}
 	}
 	
 	// Method updating the userList when new user connects
@@ -186,14 +207,12 @@ public class ChatApp {
 	// Method generating a new chartoom
 	protected void createChat (List<String> users) {
 		UUID chatId = UUID.randomUUID();
-		
+		users.add(username);
 		ChatRoom chatroom = new ChatRoom(chatId, users);
-		
 		// Writing the new chatroom object in the space and sending a notification to all the concerned users
 		try {
 			space.write(chatroom, null, 5*60*1000);
 
-			space.write(new ChatNotification(chatId, username), null, 10*1000);
 			users.forEach((user) -> {
 				try {
 					space.write(new ChatNotification(chatId, user), null, 10*1000);
@@ -206,17 +225,17 @@ public class ChatApp {
 		}
 	}
 	
+	// Method connecting to a new chatroom based on the chatroom id
 	public void connectToChat(UUID chatroom) {
 		
 		// Collecting the list of users present to use it as a title
 		ChatRoom meow = new ChatRoom();
-		String title = "Chat : "; 
+		String title = username + " - Chat : "; 
 		meow.id = chatroom;
 		try {
-			meow = (ChatRoom) space.read(meow, null, 5*1000);
+			meow = (ChatRoom) space.read(meow, null, 10*1000);
 			meow.users.forEach((usr) -> {
 				title.concat(usr + ", ");
-				System.out.println(title);
 			});
 //			title.substring(0, title.length() - 2);
 		} catch (Exception e) {
@@ -231,6 +250,25 @@ public class ChatApp {
 	public static void main(java.lang.String[] args) {
 		new ChatApp();
 	}
+
+	private void collectSavedMessages (){
+		SavedText txtTemplate = new SavedText();
+		txtTemplate.saver = username;
+
+		try {
+			if (space.readIfExists(txtTemplate, null, 5*60*1000) != null) {
+				SavedTextWindow svTxtWdw = new SavedTextWindow ();
+				svTxtWdw.setVisible(true);
+				while (space.readIfExists(txtTemplate, null, 5*60*1000) != null) { 
+					 svTxtWdw.addMessage((SavedText) space.take(txtTemplate, null, 10*1000));
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	// Method to terminate the ChatApp remove the user from the space and stop the timer renewing it
 	public void terminate() {

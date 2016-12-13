@@ -50,8 +50,17 @@ public class ChatsWindow extends JFrame {
 			}
 		}  );
 		
-		inputPanel.add(sendBut, "East");
+		JButton saveBut = new JButton ();
+		saveBut.setText("Save");
+		saveBut.addActionListener (new java.awt.event.ActionListener () {
+			public void actionPerformed (java.awt.event.ActionEvent evt) {
+				chat.saveText(textPart.getSelectedText());
+			}
+		}  );
 		
+		inputPanel.add(sendBut, "East");
+		inputPanel.add(saveBut, "East");
 		inTab.add(inputPanel, "South");
+		this.pack();
 	}
 }

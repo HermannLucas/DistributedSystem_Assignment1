@@ -58,7 +58,7 @@ public class MessageHandler implements RemoteEventListener {
 			space.notify(notifTemplate, null, this.theStub, 10*60*1000, null);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 	}
 	
 	// This method is called when a new message arrive
@@ -133,6 +133,15 @@ public class MessageHandler implements RemoteEventListener {
 			e.printStackTrace();
 		}
 		return chat.users;
+	}
+	
+	// sending the text to be saved
+	protected void saveText(SavedText txt) {
+		try {
+			space.write(txt,null,20*60*1000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

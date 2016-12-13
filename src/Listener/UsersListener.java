@@ -5,7 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import Notifications.MsgNotification;
-import Notifications.UsersNotification;
+import Notifications.UserNotification;
 import Ressources.SpaceUtils;
 import assignment.ChatApp;
 import assignment.Message;
@@ -54,8 +54,9 @@ public class UsersListener implements RemoteEventListener {
 			// Registering the remote object and collect the reference to the 'stub'
 			theStub = (RemoteEventListener) myDefaultExporter.export(this);
 
-			// Make an empty template to listen to any notification
-			UsersNotification notifTemplate = new UsersNotification();
+			// Make template with our username to listen to every notificqations comming to us
+			UserNotification notifTemplate = new UserNotification();
+			notifTemplate.target = vador.username;
 			space.notify(notifTemplate, null, this.theStub, 10*60*1000, null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,17 +66,21 @@ public class UsersListener implements RemoteEventListener {
 	// This method is called when the event is triggered
 	// it collects the new notification
 	public void notify (RemoteEvent ev) {
-		UsersNotification newNotifTemplate = new UsersNotification();
-
+		UserNotification newNotifTemplate = new UserNotification();
+		newNotifTemplate.target = vador.username;
 		try {
-			UsersNotification newNotif = (UsersNotification)space.read(newNotifTemplate, null, 10*60*1000);
+			UserNotification newNotif = (UserNotification)space.take(newNotifTemplate, null, 10*60*1000);
 
-			// Based on the boolean of the object call the connect or disconnect method of the ChatApp class
-			if (newNotif.connected == true) {
-				vador.userConnect(newNotif.who);
-			} else {
-				vador.userDisconnect(newNotif.who);
-			}
+			String newUsr = newNotif.who;
+			// Check if it's not related to us
+//			if (newUsr != vador.username) {
+				// Based on the boolean of the object call the connect or disconnect method of the ChatApp class
+				if (newNotif.connected == true) {
+					vador.userConnect(newUsr);
+				} else {
+					vador.userDisconnect(newUsr);
+				}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();			
 		}

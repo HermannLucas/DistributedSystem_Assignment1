@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.text.Position;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,7 +18,7 @@ import javax.swing.JList;
 // GUI listing the connected users
 public class UserPanel extends JFrame {
 
-	private ChatApp vador;
+	private ChatApp vador; ;
 	private JPanel userPanel, buttPanel;
 	private JLabel buttLbl;
 	private JButton chatBut;
@@ -67,6 +68,7 @@ public class UserPanel extends JFrame {
 		buttPanel.add(chatBut);
 		
 		userCont.add(buttPanel, "South");
+		this.pack();
 	}
 	
 	// Method to remove a user from the connected user list
@@ -74,15 +76,14 @@ public class UserPanel extends JFrame {
 		int index = userLi.getNextMatch(usr, 0, Position.Bias.Forward );
 		if (index != -1) {
 			userLiModel.remove(index);
+			this.pack();
 		}
 	}
 	
 	// Method to add a new user to the connected user list
 	public void userConnect (String usr) {
-		int index = userLi.getNextMatch(usr, 0, Position.Bias.Forward );
-		if (index == -1) {
-			userLiModel.addElement(usr);
-		}
+		userLiModel.addElement(usr);
+		this.pack();
 	}
 
 }

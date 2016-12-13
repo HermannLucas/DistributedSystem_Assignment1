@@ -48,7 +48,7 @@ public class ChatListener implements RemoteEventListener {
 			// Registering the remote object and collect the reference to the 'stub'
 			theStub = (RemoteEventListener) myDefaultExporter.export(this);
 
-			// Make an empty template to listen to any notification
+			// Make a template to listen to any notification toward us
 			ChatNotification notifTemplate = new ChatNotification();
 			notifTemplate.target = vador.username;
 			space.notify(notifTemplate, null, this.theStub, 10*60*1000, null);
@@ -62,10 +62,9 @@ public class ChatListener implements RemoteEventListener {
 	public void notify (RemoteEvent ev) {
 		
 		ChatNotification newNotifTemplate = new ChatNotification();
-
+		newNotifTemplate.target = vador.username;
 		try {
-			ChatNotification newNotif = (ChatNotification)space.read(newNotifTemplate, null, 10*60*1000);
-
+			ChatNotification newNotif = (ChatNotification)space.take(newNotifTemplate, null, 10*60*1000);
 			vador.connectToChat(newNotif.chatId);
 		} catch (Exception e) {
 			e.printStackTrace();			

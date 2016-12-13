@@ -80,6 +80,8 @@ public class StartUp extends JFrame{
 				}
 			}
 		});
+		
+		this.pack();
 
 	}
 
